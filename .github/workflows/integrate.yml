@@ -14,4 +14,6 @@ jobs:
           port: 22
           script: |
             whoami
-            ls -al
+            ls -a
+            cd express-starter
+            ls -a
