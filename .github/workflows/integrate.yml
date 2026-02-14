@@ -1,11 +1,17 @@
-name: Remote SSH Command
-on: [push]
+name: Deployment
+on:
+  push:
+    branches:
+      - master
+      - staging
+
 jobs:
-  build:
-    name: Build
+  deploy:
+    name: Build and deploy to Production
     runs-on: ubuntu-latest
     steps:
-      - name: Execute remote SSH commands using key
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/master'
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.HOST }}
@@ -13,7 +19,33 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           port: 22
           script: |
-            whoami
-            ls -a
+            set -e
+
             cd express-starter
-            ls -a
+
+            git fetch origin 
+            git reset --hard origin/master
+
+            npm install
+            npm run build
+            pm2 restart express-app || PORT=3000 pm2 start dist/index.js --name express-app
+
+      - name: Deploy to Staging
+        if: github.ref == 'refs/heads/staging'
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            cd express-starter/staging
+
+            git fetch origin 
+            git reset --hard origin/staging
+
+            npm install
+            npm run build
+            pm2 restart express-app-staging || PORT=3001 pm2 start dist/index.js --name express-app-staging

@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 
+const PORT = process.env.PORT || 3000;
+
 let todos: { name: string; status: "done" | "pending" | "ongoing" }[] = [];
 const app = express();
 
@@ -66,6 +68,6 @@ app.get("/throw-error", (req, res) => {
   }, 0);
 });
 
-app.listen(3000, () => {
-  console.log("Server running at 3000 port");
+app.listen(PORT, () => {
+  console.log("Server running at port " + PORT);
 });
