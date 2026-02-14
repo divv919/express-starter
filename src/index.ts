@@ -11,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "This is a get route" });
+  res
+    .status(200)
+    .json({ message: "This is a get route of the staging branch" });
 });
 
 app.get("/get-all-todo", (_, res) => {
